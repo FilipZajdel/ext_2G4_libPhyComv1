@@ -138,6 +138,26 @@ int p2G4_dev_pick_wait_resp_s_c_b(p2G4_dev_state_s_t *p2G4_dev_st);
 void p2G4_dev_disconnect_s_c(p2G4_dev_state_s_t *p2G4_dev_st);
 void p2G4_dev_terminate_s_c(p2G4_dev_state_s_t *p2G4_dev_st);
 
+/*
+ * IEEE 802.15.4 related API
+ *
+ * All of the following functions are blocking and keep the state of devices.
+ */
+
+int p802154_dev_initcom(uint device_id, const char *simulation_name, const char *phy_name);
+void p802154_dev_terminate();
+void p802154_dev_disconnect();
+
+int p802154_dev_req_tx(p802154_tx_t *tx_s, uint8_t *buf, p2G4_tx_done_t *tx_done_s);
+int p802154_dev_provide_new_tx_abort(p2G4_abort_t *abort);
+
+int p802154_dev_req_rx(p802154_rx_t *rx_s, p2G4_rx_done_t *rx_done_s, uint8_t **rx_buf, size_t buf_size);
+int p802154_dev_preamble_verified(bool is_preamble_valid);
+int p802154_dev_provide_new_rx_abort(p2G4_abort_t *abort);
+
+int p802154_dev_req_RSSI(p2G4_rssi_t *RSSI_s, p2G4_rssi_done_t *RSSI_done_s);
+int p802154_dev_req_wait(pb_wait_t *wait_s);
+
 #ifdef __cplusplus
 }
 #endif

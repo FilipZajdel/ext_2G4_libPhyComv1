@@ -98,16 +98,30 @@ typedef struct __attribute__ ((packed)) {
   p2G4_abort_t abort;
 } p2G4_rx_t;
 
+typedef struct __attribute__((packed)) {
+  /* Absolute us when the receiver starts scanning. */
+  bs_time_t start_time;
+  /* Time in which we need to get a preamble before giving up
+   * Once we get a preamble + address match we will continue to receive the
+   * whole packet, unless there is a header error.
+   * We scan in the range [ start_time,  start_time + scan_duration - 1] us */
+  uint32_t scan_duration;
+  p2G4_abort_t abort;
+  p2G4_radioparams_t radio_params;
+  p2G4_power_t antenna_gain;
+  /* Data rate in bits per second */
+  uint32_t bps;
+  uint8_t preamble_sfd;
+} p802154_rx_t;
+
 typedef struct __attribute__ ((packed)) {
   /* absolute us when the first bit of the packet is sent to the air
    * = the begining of the preamble */
   bs_time_t start_time;
   /* absolute us when the last bit of the packet is sent to the air */
   bs_time_t end_time;
-  /*
-   * Structure defining when the device may want to abort the transmission
-   * Note: abort_time shall be > start_time
-   */
+  /* Structure defining when the device may want to abort the transmission
+   * Note: abort_time shall be > start_time */
   p2G4_abort_t abort;
   /* Phy address/access code used in the packet */
   uint32_t phy_address;
@@ -117,6 +131,18 @@ typedef struct __attribute__ ((packed)) {
   /* Packet size in bytes; Only used for moving the payload, not modeling related */
   uint16_t packet_size;
 } p2G4_tx_t;
+
+typedef struct __attribute__ ((packed)) {
+  /* Absolute us when the transmission starts. */
+  bs_time_t start_time;
+  /* Absolute us time when the transmission ends. */
+  bs_time_t end_time;
+  p2G4_abort_t abort;
+  p2G4_radioparams_t radio_params;
+  p2G4_power_t power_level;
+  uint8_t preamble_sfd;
+  uint16_t psdu_size;
+} p802154_tx_t;
 
 typedef struct __attribute__ ((packed)) {
   /* one of P2G4_RXSTATUS* */

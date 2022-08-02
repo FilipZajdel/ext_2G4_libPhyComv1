@@ -89,3 +89,79 @@ int p2G4_dev_req_RSSI_nc_b(p2G4_rssi_t *RSSI_s, p2G4_rssi_done_t *RSSI_done_s) {
 int p2G4_dev_req_wait_nc_b(pb_wait_t *wait_s){
   return p2G4_dev_req_wait_s_nc_b(&C2G4_dev_st_nc, wait_s);
 }
+
+
+/*
+ * IEEE 802.15.4 API implementation
+ */
+
+/* For 2 bytes long header and BLE Phy, 1MBPS */
+#define HEADER_DURATION_US (2 * 8)
+/* 1 Byte preamble, 4 bytes address */
+#define PREAMBLE_AND_ADDR_DURATION_US ((1 + 4) * 8)
+
+int p802154_dev_initcom(uint device_id, const char *simulation_name, const char *phy_name) {
+  return p2G4_dev_initcom_nc(device_id, simulation_name, phy_name);
+}
+
+void p802154_dev_terminate(void) {
+  p2G4_dev_terminate_nc();
+}
+
+void p802154_dev_disconnect(void) {
+  p2G4_dev_disconnect_nc();
+}
+
+int p802154_dev_req_tx(p802154_tx_t *tx_s, uint8_t *buf, p2G4_tx_done_t *tx_done) {
+
+  p2G4_tx_t p2G4_tx;
+
+  p2G4_tx.start_time = tx_s->start_time;
+  p2G4_tx.end_time = tx_s->end_time;
+  p2G4_tx.abort = tx_s->abort;
+  p2G4_tx.phy_address = (uint32_t)tx_s->preamble_sfd;
+  p2G4_tx.radio_params = tx_s->radio_params;
+  p2G4_tx.power_level = tx_s->power_level;
+  p2G4_tx.packet_size = tx_s->psdu_size;
+
+  return p2G4_dev_req_tx_nc_b(&p2G4_tx, buf, tx_done);
+}
+
+int p802154_dev_provide_new_tx_abort(p2G4_abort_t *abort) {
+  return p2G4_dev_provide_new_tx_abort_nc_b(abort);
+}
+
+int p802154_dev_req_rx(p802154_rx_t *rx_s, p2G4_rx_done_t *rx_done, uint8_t **rx_buf, size_t buf_size) {
+
+  p2G4_rx_t p2G4_rx;
+
+  p2G4_rx.start_time = rx_s->start_time;
+  p2G4_rx.scan_duration = rx_s->scan_duration;
+  p2G4_rx.radio_params = rx_s->radio_params;
+  p2G4_rx.antenna_gain = rx_s->antenna_gain;
+  p2G4_rx.bps = rx_s->bps;
+  p2G4_rx.abort = rx_s->abort;
+  p2G4_rx.phy_address = (uint32_t)rx_s->preamble_sfd;
+  p2G4_rx.sync_threshold = 0;
+  p2G4_rx.header_threshold = 0;
+  p2G4_rx.header_duration = HEADER_DURATION_US;
+  p2G4_rx.pream_and_addr_duration = PREAMBLE_AND_ADDR_DURATION_US;
+
+  return p2G4_dev_req_rx_nc_b(&p2G4_rx, rx_done, rx_buf, buf_size);
+}
+
+int p802154_dev_preamble_verified(bool is_preamble_valid) {
+  return p2G4_dev_rx_cont_after_addr_nc_b(is_preamble_valid);
+}
+
+int p802154_dev_provide_new_rx_abort(p2G4_abort_t *abort) {
+  return p2G4_dev_provide_new_rx_abort_nc_b(abort);
+}
+
+int p802154_dev_req_RSSI(p2G4_rssi_t *rssi, p2G4_rssi_done_t *rssi_done) {
+  return p2G4_dev_req_RSSI_nc_b(rssi, rssi_done);
+}
+
+int p802154_dev_req_wait(pb_wait_t *wait_s) {
+  return p2G4_dev_req_wait_nc_b(wait_s);
+}
